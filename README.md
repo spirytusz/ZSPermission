@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements ZSPermission.OnPe
 ```
 
 ## step 5:
-申请权限，也可以使用[PermissionGroup]()中的常量来一次申请指定权限组的全部权限:
+申请权限，也可以使用[PermissionGroup](https://github.com/zkw012300/ZSPermission/blob/master/PermissionGroup.md)中的常量来一次申请指定权限组的全部权限:
 ```
 ZSPermission.getInstance()
             .at(this)
