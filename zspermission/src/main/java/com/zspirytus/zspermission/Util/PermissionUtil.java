@@ -6,7 +6,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 
 /**
- * Created by zhangkunwei on 2018/6/22.
+ * Created by ZSpirytus on 2018/6/22.
  */
 
 public class PermissionUtil {

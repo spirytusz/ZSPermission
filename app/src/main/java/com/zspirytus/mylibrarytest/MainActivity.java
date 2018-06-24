@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity implements ZSPermission.OnPe
                 .at(this)
                 .requestCode(REQUEST_CAMERA)
                 .permissions(PermissionGroup.CAMERA_GROUP)
+                .permissions(PermissionGroup.PHONE_GROUP)
                 .listenBy(this)
                 .request();
     }

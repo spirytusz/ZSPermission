@@ -5,11 +5,11 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.util.ArraySet;
 
 import com.zspirytus.zspermission.Util.PermissionUtil;
 
+import java.util.Arrays;
 import java.util.Set;
 
 /**
@@ -25,10 +25,12 @@ public class ZSPermission {
     private String[] permissions;
     private OnPermissionListener listener;
 
-    private Set<Integer> codes = new ArraySet<>();
+    private Set<Integer> codes;
 
     private ZSPermission() {
-
+        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
+            codes = new ArraySet<>();
+        }
     }
 
     public interface OnPermissionListener {
@@ -64,7 +66,7 @@ public class ZSPermission {
     }
 
     public ZSPermission requestCode(Integer requestCode) {
-        if (!codes.contains(requestCode)) {
+        if (codes != null && !codes.contains(requestCode)) {
             code = requestCode;
             codes.add(code);
             return instance;
@@ -74,12 +76,17 @@ public class ZSPermission {
     }
 
     public ZSPermission permission(String permission) {
-        this.permissions = new String[]{permission};
-        return instance;
+        return permissions(new String[]{permission});
     }
 
     public ZSPermission permissions(String[] permissions) {
-        this.permissions = permissions;
+        if(this.permissions == null){
+            this.permissions = permissions;
+        } else {
+            int len = this.permissions.length;
+            this.permissions = Arrays.copyOf(this.permissions,len+permissions.length);
+            System.arraycopy(permissions,0,this.permissions,len,permissions.length);
+        }
         return instance;
     }
 
@@ -93,9 +100,11 @@ public class ZSPermission {
         if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M){
             if (listener != null) {
                 listener.onGranted();
+                free();
             } else {
                 throw new AssertionError("You must implement interface:" + OnPermissionListener.class.getSimpleName());
             }
+            return;
         }
         // 运行的安卓版本不低于Android M
         if (activity != null && code != 0
@@ -104,6 +113,7 @@ public class ZSPermission {
             if (PermissionUtil.checkIfGranted(activity,permissions)) {
                 if (listener != null) {
                     listener.onGranted();
+                    free();
                 } else {
                     throw new AssertionError("You must implement interface:" + OnPermissionListener.class.getSimpleName());
                 }
@@ -113,6 +123,13 @@ public class ZSPermission {
         }
     }
 
+    private void free(){
+        activity = null;
+        code = 0;
+        permissions = null;
+        listener = null;
+    }
+
     public void onRequestPermissionResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (instance != null) {
             if (codes.contains(requestCode)) {
@@ -120,6 +137,7 @@ public class ZSPermission {
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if (listener != null) {
                         listener.onGranted();
+                        free();
                     } else {
                         throw new AssertionError("You must implement interface:" + OnPermissionListener.class.getSimpleName());
                     }
