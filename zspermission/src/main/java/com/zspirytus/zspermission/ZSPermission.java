@@ -25,12 +25,8 @@ public class ZSPermission {
     private String[] permissions;
     private OnPermissionListener listener;
 
-    private Set<Integer> codes;
-
     private ZSPermission() {
-        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
-            codes = new ArraySet<>();
-        }
+
     }
 
     public interface OnPermissionListener {
@@ -66,13 +62,8 @@ public class ZSPermission {
     }
 
     public ZSPermission requestCode(Integer requestCode) {
-        if (codes != null && !codes.contains(requestCode)) {
-            code = requestCode;
-            codes.add(code);
-            return instance;
-        } else {
-            throw new AssertionError("requestCode should be unique!");
-        }
+        code = requestCode;
+        return instance;
     }
 
     public ZSPermission permission(String permission) {
@@ -132,8 +123,7 @@ public class ZSPermission {
 
     public void onRequestPermissionResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (instance != null) {
-            if (codes.contains(requestCode)) {
-                codes.remove(requestCode);
+            if (code == requestCode) {
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if (listener != null) {
                         listener.onGranted();
