@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.util.Log;
 
 import com.zspirytus.zspermission.Util.PermissionUtil;
 
@@ -87,6 +88,7 @@ public class ZSPermission {
     public void request() {
         // 运行的安卓版本低于Android M
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            Log.i(this.getClass().getSimpleName(), "below Android M");
             if (listener != null) {
                 listener.onGranted();
                 free();
@@ -100,6 +102,7 @@ public class ZSPermission {
                 && permissions != null
                 && permissions.length != 0) {
             if (PermissionUtil.checkIfGranted(activity, permissions)) {
+                Log.i(this.getClass().getSimpleName(), "permissions has been granted.");
                 if (listener != null) {
                     listener.onGranted();
                     free();
@@ -107,6 +110,7 @@ public class ZSPermission {
                     throw new AssertionError("You must implement interface:" + OnPermissionListener.class.getSimpleName());
                 }
             } else {
+                Log.i(this.getClass().getSimpleName(), "request Permission.");
                 PermissionUtil.requestPermissions(activity, permissions, code);
             }
         }
@@ -122,9 +126,7 @@ public class ZSPermission {
     public void onRequestPermissionResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (instance != null) {
             if (code == requestCode) {
-                if (grantResults.length == 0) {
-                    request();
-                } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if (listener != null) {
                         listener.onGranted();
                         free();
