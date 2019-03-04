@@ -5,12 +5,10 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.util.ArraySet;
 
 import com.zspirytus.zspermission.Util.PermissionUtil;
 
 import java.util.Arrays;
-import java.util.Set;
 
 /**
  * Created by ZSpirytus on 2018/6/22.
@@ -71,12 +69,12 @@ public class ZSPermission {
     }
 
     public ZSPermission permissions(String[] permissions) {
-        if(this.permissions == null){
+        if (this.permissions == null) {
             this.permissions = permissions;
         } else {
             int len = this.permissions.length;
-            this.permissions = Arrays.copyOf(this.permissions,len+permissions.length);
-            System.arraycopy(permissions,0,this.permissions,len,permissions.length);
+            this.permissions = Arrays.copyOf(this.permissions, len + permissions.length);
+            System.arraycopy(permissions, 0, this.permissions, len, permissions.length);
         }
         return instance;
     }
@@ -88,7 +86,7 @@ public class ZSPermission {
 
     public void request() {
         // 运行的安卓版本低于Android M
-        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M){
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             if (listener != null) {
                 listener.onGranted();
                 free();
@@ -101,7 +99,7 @@ public class ZSPermission {
         if (activity != null && code != 0
                 && permissions != null
                 && permissions.length != 0) {
-            if (PermissionUtil.checkIfGranted(activity,permissions)) {
+            if (PermissionUtil.checkIfGranted(activity, permissions)) {
                 if (listener != null) {
                     listener.onGranted();
                     free();
@@ -114,7 +112,7 @@ public class ZSPermission {
         }
     }
 
-    private void free(){
+    private void free() {
         activity = null;
         code = 0;
         permissions = null;
@@ -124,7 +122,9 @@ public class ZSPermission {
     public void onRequestPermissionResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (instance != null) {
             if (code == requestCode) {
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.length == 0) {
+                    request();
+                } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if (listener != null) {
                         listener.onGranted();
                         free();
