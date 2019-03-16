@@ -11,13 +11,22 @@ import android.support.v4.content.ContextCompat;
 
 public class PermissionUtil {
 
-    private PermissionUtil(){
+    private PermissionUtil() {
         throw new AssertionError();
     }
 
-    public static boolean checkIfGranted(Activity activity,String[] permissions) {
-        for (int i = 0; i < permissions.length; i++) {
-            if (ContextCompat.checkSelfPermission(activity, permissions[i]) == PackageManager.PERMISSION_DENIED) {
+    public static boolean checkIfGranted(Activity activity, String[] permissions) {
+        for (String permission : permissions) {
+            if (ContextCompat.checkSelfPermission(activity, permission) == PackageManager.PERMISSION_DENIED) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean checkIfGranted(int[] grantResults) {
+        for (int grantResult : grantResults) {
+            if (grantResult != PackageManager.PERMISSION_GRANTED) {
                 return false;
             }
         }

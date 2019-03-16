@@ -1,14 +1,13 @@
 package com.zspirytus.zspermission;
 
 import android.app.Activity;
-import android.content.pm.PackageManager;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.util.Log;
 
+import com.zspirytus.zspermission.Util.ArraysUtil;
 import com.zspirytus.zspermission.Util.PermissionUtil;
-
-import java.util.Arrays;
 
 /**
  * Created by ZSpirytus on 2018/6/22.
@@ -72,9 +71,7 @@ public class ZSPermission {
         if (this.permissions == null) {
             this.permissions = permissions;
         } else {
-            int len = this.permissions.length;
-            this.permissions = Arrays.copyOf(this.permissions, len + permissions.length);
-            System.arraycopy(permissions, 0, this.permissions, len, permissions.length);
+            this.permissions = ArraysUtil.concat(this.permissions, permissions);
         }
         return instance;
     }
@@ -86,30 +83,37 @@ public class ZSPermission {
 
     public void request() {
         // 运行的安卓版本低于Android M
+        for (String p : this.permissions) {
+            Log.e(this.getClass().getSimpleName(), "apply Permission = " + p);
+        }
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             if (listener != null) {
                 listener.onGranted();
                 free();
             } else {
-                throw new AssertionError("You must implement interface:" + OnPermissionListener.class.getSimpleName());
+                throw new IllegalStateException("You must implement interface:" + OnPermissionListener.class.getSimpleName());
             }
             return;
         }
         // 运行的安卓版本不低于Android M
-        if (activity != null && code != 0
-                && permissions != null
-                && permissions.length != 0) {
+        if (activity != null && code != 0 && permissions != null && permissions.length != 0) {
+            boolean isGranted = PermissionUtil.checkIfGranted(activity, permissions);
+            Log.e(this.getClass().getSimpleName(), "isGranted = " + isGranted);
             if (PermissionUtil.checkIfGranted(activity, permissions)) {
                 if (listener != null) {
                     listener.onGranted();
                     free();
                 } else {
-                    throw new AssertionError("You must implement interface:" + OnPermissionListener.class.getSimpleName());
+                    throw new IllegalStateException("You must implement interface:" + OnPermissionListener.class.getSimpleName());
                 }
             } else {
                 PermissionUtil.requestPermissions(activity, permissions, code);
             }
         }
+    }
+
+    public void requestAgain() {
+        request();
     }
 
     private void free() {
@@ -122,12 +126,12 @@ public class ZSPermission {
     public void onRequestPermissionResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (instance != null) {
             if (code == requestCode) {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (PermissionUtil.checkIfGranted(grantResults)) {
                     if (listener != null) {
                         listener.onGranted();
                         free();
                     } else {
-                        throw new AssertionError("You must implement interface:" + OnPermissionListener.class.getSimpleName());
+                        throw new IllegalStateException("You must implement interface:" + OnPermissionListener.class.getSimpleName());
                     }
                 } else if (grantResults.length > 0) {
                     if (!ActivityCompat.shouldShowRequestPermissionRationale(activity, permissions[0])) {
@@ -135,14 +139,14 @@ public class ZSPermission {
                         if (listener != null) {
                             listener.onNeverAsk();
                         } else {
-                            throw new AssertionError("You must implement interface:" + OnPermissionListener.class.getSimpleName());
+                            throw new IllegalStateException("You must implement interface:" + OnPermissionListener.class.getSimpleName());
                         }
                     } else {
                         //用户拒绝权限的申请
                         if (listener != null) {
                             listener.onDenied();
                         } else {
-                            throw new AssertionError("You must implement interface:" + OnPermissionListener.class.getSimpleName());
+                            throw new IllegalStateException("You must implement interface:" + OnPermissionListener.class.getSimpleName());
                         }
                     }
                 }

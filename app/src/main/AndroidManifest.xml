@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.ADD_VOICEMAIL"/>
     <uses-permission android:name="android.permission.USE_SIP"/>
     <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application
         android:allowBackup="true"

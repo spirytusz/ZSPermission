@@ -1,23 +1,20 @@
 package com.zspirytus.mylibrarytest;
 
-import android.content.DialogInterface;
+import android.Manifest;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
-import com.zspirytus.zspermission.PermissionGroup;
 import com.zspirytus.zspermission.ZSPermission;
 
 public class MainActivity extends AppCompatActivity implements ZSPermission.OnPermissionListener {
 
     private static final String TAG = "MainActivity";
 
-    private static int REQUEST_CAMERA = 233;
     private static int GO_TO_SETTINGS = 666;
 
     @Override
@@ -28,43 +25,49 @@ public class MainActivity extends AppCompatActivity implements ZSPermission.OnPe
     }
 
     private void grant() {
+        final int REQUEST_CAMERA = 233;
         ZSPermission.getInstance()
                 .at(this)
                 .requestCode(REQUEST_CAMERA)
-                .permissions(PermissionGroup.CAMERA_GROUP)
-                .permissions(PermissionGroup.PHONE_GROUP)
+                .permission(Manifest.permission.CAMERA)
+                .permission(Manifest.permission.RECORD_AUDIO)
                 .listenBy(this)
                 .request();
     }
 
     @Override
     public void onGranted() {
-        Toast.makeText(this, "successfully", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "授权成功", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onDenied() {
-        Toast.makeText(this, "denied by user", Toast.LENGTH_SHORT).show();
+        PermissionDeniedDialog.getInstance(R.string.permission_denied_tip_text)
+                .setOnButtonClickListener(new PermissionDeniedDialog.OnButtonClickListener() {
+                    @Override
+                    public void onPositiveBtnClick() {
+                        ZSPermission.getInstance().requestAgain();
+                    }
+
+                    @Override
+                    public void onNegativeBtnClick() {
+                    }
+                }).show(getSupportFragmentManager(), "PermissionDeniedDialog");
     }
 
     @Override
     public void onNeverAsk() {
-        new AlertDialog.Builder(this)
-                .setTitle("我需要权限")
-                .setMessage("我需要权限，以确保正常运行，是否前往设置开启？")
-                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+        PermissionDeniedDialog.getInstance(R.string.permission_never_ask_tip_text)
+                .setOnButtonClickListener(new PermissionDeniedDialog.OnButtonClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
+                    public void onPositiveBtnClick() {
                         goToAppSetting();
                     }
-                })
-                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
 
+                    @Override
+                    public void onNegativeBtnClick() {
                     }
-                })
-                .show();
+                }).show(getSupportFragmentManager(), "PermissionDeniedDialog");
     }
 
     @Override
@@ -84,6 +87,8 @@ public class MainActivity extends AppCompatActivity implements ZSPermission.OnPe
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        grant();
+        if (requestCode == GO_TO_SETTINGS) {
+            ZSPermission.getInstance().requestAgain();
+        }
     }
 }
