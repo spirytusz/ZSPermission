@@ -18,7 +18,7 @@ allprojects {
 ```
 dependencies {
     ...
-    implementation 'com.github.zkw012300:ZSPermission:v1.3'
+    implementation 'com.github.zkw012300:ZSPermission:v2.0'
     ...
 }
 ```
