@@ -18,7 +18,7 @@ allprojects {
 ```
 dependencies {
     ...
-    implementation 'com.github.zkw012300:ZSPermission:v2.0'
+    implementation 'com.github.zkw012300:ZSPermission:v3.0'
     ...
 }
 ```
@@ -29,53 +29,30 @@ dependencies {
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="your package">
     ...
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.CAMERA"/>
     ...
 </manifest>
 ```
 
 ## step 4:
-在需要申请权限的Activity 或Fragment中实现接口ZSPermission.OnPermissionListener
+申请权限，加入回调
 ```
-public class MainActivity extends AppCompatActivity implements ZSPermission.OnPermissionListener {
+class MainActivity : AppCompatActivity() {
     ...
-    @Override
-    public void onGranted() {
-        Toast.makeText(this, "successfully", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onDenied() {
-        Toast.makeText(this, "denied by user", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onNeverAsk() {
-        Toast.makeText(this, "denied by user and never ask", Toast.LENGTH_SHORT).show();
+    fun requestPermission(permissions: Array<out String>) {
+        PermissionFragment.getInstance(this).requestPermission(permissions) { isGranted, deniedPermissions, isNeverAsk ->
+            when {
+                isGranted -> Toast.makeText(MainActivity@ this, "Granted.", Toast.LENGTH_SHORT).show()
+                isNeverAsk -> tip()
+                else -> deniedPermissions.forEach {
+                    Log.e(TAG, "not grant: $it")
+                }
+            }
+        }
     }
     ...
 }
-```
-
-## step 5:
-申请权限，也可以使用[PermissionGroup](https://github.com/zkw012300/ZSPermission/blob/master/PermissionGroup.md)中的常量来一次申请指定权限组的全部权限:
-```
-ZSPermission.getInstance()
-            .at(this)
-            .requestCode(REQUEST_CAMERA)
-            .permissions(PermissionGroup.CAMERA_GROUP)
-            .listenBy(this)
-            .request();
-```
-
-## step 6:
-覆盖Activity的onRequestPermissionsResult()方法
-```
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        ZSPermission.getInstance().onRequestPermissionResult(requestCode, permissions, grantResults);
-    }
 ```
 
 # Demo
