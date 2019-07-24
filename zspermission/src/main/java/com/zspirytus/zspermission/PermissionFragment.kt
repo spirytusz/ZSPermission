@@ -34,7 +34,7 @@ class PermissionFragment : Fragment() {
         val shouldShowRequestPermissionRationale: Boolean = if (deniedPermissions.isEmpty()) {
             false
         } else {
-            mActivity?.let { ActivityCompat.shouldShowRequestPermissionRationale(it, deniedPermissions[0]) }
+            mActivity?.let { !ActivityCompat.shouldShowRequestPermissionRationale(it, deniedPermissions[0]) }
                 ?: false
         }
         mCallback?.invoke(deniedPermissions.isEmpty(), deniedPermissions, shouldShowRequestPermissionRationale)
