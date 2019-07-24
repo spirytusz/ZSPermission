@@ -1,6 +1,7 @@
 package com.zspirytus.zspermission
 
 import android.os.Bundle
+import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
 import com.zspirytus.zspermission.utils.PermissionUtils
@@ -8,34 +9,35 @@ import com.zspirytus.zspermission.utils.PermissionUtils
 class PermissionFragment : Fragment() {
 
     private var mActivity: FragmentActivity? = null
-    private var mCallbacks: HashMap<Int, ((Boolean, Array<out String>) -> Unit)?>? = null
+    private var mCallback: ((Boolean, Array<out String>, Boolean) -> Unit)? = null
+    private var mRequestCode: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         retainInstance = true
         mActivity = activity
-        mCallbacks = HashMap()
     }
 
     fun requestPermission(
         permissions: Array<String>,
-        callback: ((isGranted: Boolean, deniedPermissions: Array<out String>) -> Unit)?
+        callback: ((Boolean, Array<out String>, Boolean) -> Unit)?
     ) {
-        val requestCode = generateRequestCode()
-        mCallbacks?.put(requestCode, callback)
-        requestPermissions(permissions, requestCode)
+        mRequestCode = 233
+        mCallback = callback
+        requestPermissions(permissions, mRequestCode as Int)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        val callback = mCallbacks?.get(requestCode)
         val deniedPermissions = PermissionUtils.checkGrantResults(permissions, grantResults)
         mActivity?.supportFragmentManager?.beginTransaction()?.remove(this)?.commitAllowingStateLoss()
-        callback?.invoke(deniedPermissions.isEmpty(), deniedPermissions)
-    }
-
-    private fun generateRequestCode(): Int {
-        return 233
+        val shouldShowRequestPermissionRationale: Boolean = if (deniedPermissions.isEmpty()) {
+            false
+        } else {
+            mActivity?.let { ActivityCompat.shouldShowRequestPermissionRationale(it, deniedPermissions[0]) }
+                ?: false
+        }
+        mCallback?.invoke(deniedPermissions.isEmpty(), deniedPermissions, shouldShowRequestPermissionRationale)
     }
 
     companion object {

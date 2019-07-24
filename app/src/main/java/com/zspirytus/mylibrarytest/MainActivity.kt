@@ -18,15 +18,26 @@ class MainActivity : AppCompatActivity() {
             android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
             android.Manifest.permission.CAMERA
         )
-        PermissionFragment.getInstance(this).requestPermission(permissions) { isGranted, deniedPermissions ->
-            if (isGranted) {
-                Toast.makeText(MainActivity@ this, "Granted.", Toast.LENGTH_SHORT).show()
-            } else {
-                deniedPermissions.forEach {
+        PermissionFragment.getInstance(this).requestPermission(permissions) { isGranted, deniedPermissions, shouldShowRequestPermissionRationale ->
+            when {
+                isGranted -> Toast.makeText(MainActivity@ this, "Granted.", Toast.LENGTH_SHORT).show()
+                shouldShowRequestPermissionRationale -> tip()
+                else -> deniedPermissions.forEach {
                     Log.e(TAG, "not grant: $it")
                 }
             }
         }
+    }
+
+    private fun tip() {
+        PermissionDeniedDialog.getInstance(R.string.permission_never_ask_tip_text)
+            .setOnButtonClickListener(object : PermissionDeniedDialog.OnButtonClickListener {
+                override fun onPositiveBtnClick() {
+                    goToAppSetting()
+                }
+
+                override fun onNegativeBtnClick() {}
+            }).show(supportFragmentManager, "PermissionDeniedDialog")
     }
 
     private fun goToAppSetting() {
