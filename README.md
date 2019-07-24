@@ -56,4 +56,4 @@ class MainActivity : AppCompatActivity() {
 ```
 
 # Demo
-[这里](https://github.com/zkw012300/ZSPermission/blob/master/app/src/main/java/com/zspirytus/mylibrarytest/MainActivity.java)
+[这里](https://github.com/zkw012300/ZSPermission/blob/master/app/src/main/java/com/zspirytus/mylibrarytest/MainActivity.kt)
