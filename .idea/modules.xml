@@ -5,10 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/MyLibraryTest.iml" filepath="$PROJECT_DIR$/MyLibraryTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/ZSPermission.iml" filepath="$PROJECT_DIR$/.idea/ZSPermission.iml" />
       <module fileurl="file://$PROJECT_DIR$/ZSPermission.iml" filepath="$PROJECT_DIR$/ZSPermission.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/ZSPermission.iml" filepath="$PROJECT_DIR$/.idea/ZSPermission.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/zspermission/zspermission.iml" filepath="$PROJECT_DIR$/zspermission/zspermission.iml" />
       <module fileurl="file://$PROJECT_DIR$/zspermission/zspermission.iml" filepath="$PROJECT_DIR$/zspermission/zspermission.iml" />
     </modules>
   </component>
