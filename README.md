@@ -1,3 +1,4 @@
+[![](https://jitpack.io/v/zkw012300/ZSPermission.svg)](https://jitpack.io/#zkw012300/ZSPermission)
 # ZSPermission
 一个经过简单封装的运行时动态申请权限库，适用于Android 6.0及其以上系统，以供复用
 
